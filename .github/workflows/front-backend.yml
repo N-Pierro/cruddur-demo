@@ -1,0 +1,61 @@
+name: Shared CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+    pull-request:
+      branches:
+        - main
+    workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - name: frontend
+            path: frontend-react-js
+            image: ghcr.io/${{ github.repository_owner }}/cruddur-frontend
+          - name: backend
+            path: backend-flask
+            image: ghcr.io/${{ github.repository_owner }}/cruddur-backend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set lowercase owner name
+        run: echo "OWNER_LC=${OWNER,,}" >> $GITHUB_ENV
+        env: 
+          OWNER: "${{ github.repository_owner }}"
+
+      - name: set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT}}
+      - name: Set image tag
+        id: meta
+        run: |
+          echo "image=ghcr.io/${OWNER_LC}/cruddur-${{ matrix.service.name }}:${{ github.sha }}" >> $GITHUB_OUTPUT
+      - name: Build and push image 
+        uses: docker/build-push-action@v3
+        with:
+          context: ./${{ matrix.service.path }}
+          file: ./${{matrix.service.path}}/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.image }}
+      - name: write image to file
+        run: echo "${{ steps.meta.outputs.image }}" > tag.txt
+
+      - name: upload image tag artificat
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.service.name }}-image-tag
+          path: tag.txt 
