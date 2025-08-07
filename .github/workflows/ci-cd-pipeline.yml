@@ -28,7 +28,7 @@ jobs:
       infrastructure-changed: ${{ steps.changes.outputs.infrastructure }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/path-filter
+      - uses: dorny/path-filter@v3
         id: changes
         with:
           base: week-1   # for testing, on base branch other than the main (week-1) 
