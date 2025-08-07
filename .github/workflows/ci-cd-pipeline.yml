@@ -30,7 +30,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dorny/path-filter
         id: changes
-        with: 
+        with:
+          base: week-1   # for testing, on base branch other than the main (week-1) 
           filters: |
             backend:
               - 'backend-flask/**'
