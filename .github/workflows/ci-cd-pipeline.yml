@@ -15,6 +15,8 @@ env:
   ECR_REPOSITORY_FRONTEND: cruddur-frontend
   EKS_CLUSTER_NAME: cruddur-cluster
 
+permissions:
+  security-events: write     # for sarif upload
 
 
 jobs:
@@ -28,10 +30,11 @@ jobs:
       infrastructure-changed: ${{ steps.changes.outputs.infrastructure }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/path-filter@v2
+      - uses: dorny/paths-filter@v2
         id: changes
         with:
-          base: week-1   # for testing, on base branch other than the main (week-1) 
+          base: ${{ github.event.before }}   # let action compare current branch with base
+          ref: ${{ github.sha }}
           filters: |
             backend:
               - 'backend-flask/**'
