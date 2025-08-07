@@ -28,7 +28,7 @@ jobs:
       infrastructure-changed: ${{ steps.changes.outputs.infrastructure }}
     steps:
       - uses: actions/checkout@v4
-      - uses: dorny/path-filter@v3
+      - uses: dorny/path-filter@v2
         id: changes
         with:
           base: week-1   # for testing, on base branch other than the main (week-1) 
@@ -184,7 +184,7 @@ jobs:
           output: 'trivy-config-results.sarif'
 
       - name: Upload Trivy scan results to GITHUB Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with: 
           sarif_file: 'trivy-fs-results.sarif'
