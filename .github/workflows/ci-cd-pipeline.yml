@@ -2,7 +2,7 @@ name: cruddur CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop, feature/*]
+    branches: [main, week-1, feature/*]
   pull_request:
     branches: [main, develop]
 
