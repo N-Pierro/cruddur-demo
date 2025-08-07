@@ -31,14 +31,14 @@ jobs:
       - uses: dorny/path-filter
         id: changes
         with: 
-        filters: |
-          backend:
-            - 'backend-flask/**'
-          frontend:
-            - 'frontend-react-js/**'
-          infrastructure:
-            - 'infrastructure/**'
-            - '.github/workflows/**'
+          filters: |
+            backend:
+              - 'backend-flask/**'
+            frontend:
+              - 'frontend-react-js/**'
+            infrastructure:
+              - 'infrastructure/**'
+              - '.github/workflows/**'
 
 # ====================== Backend Testing ==================================
 
