@@ -60,63 +60,62 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-      steps:
-        - name: checkout code 
-          uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-        - name: Set up Python 3.9
-          uses: actions/setup-python@v4
-          with:
-            python-version: '3.9'
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-        - name: Cache pip dependencies
-          uses: actions/cache@v3
-          with:
-            path: ~/.cache/pip
-            key: ${{ runner.os }}-pip-${{ hashFiles('backend-flask/requirements.txt') }}
-        - name: Install dependencies
-          run: |
-            cd backend-flask
-            pip install -r requirements.txt
-            pip install pytest coverage pytest-cov flake8 black
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend-flask/requirements.txt') }}
+      - name: Install dependencies
+        run: |
+          cd backend-flask
+          pip install -r requirements.txt
+          pip install pytest coverage pytest-cov flake8 black
 
-        - name: Code formatting check
-          run: | 
-            cd backend-flask
-            black --check .
-            flake8 . --count --max-complexity=10 --max-line-length=88 --statistics
-        - name: Set up test database
-          env:
-            DATABASE_URL: postgresql://postgres:password@localhost:5432/cruddur_test
-          run: |
-            cd backend-flask
-            python -c "
-            import psycopg2
-            from db.schema_load import load_schema
-            load_schema()
-            "
+      - name: Code formatting check
+        run: | 
+          cd backend-flask
+          black --check .
+          flake8 . --count --max-complexity=10 --max-line-length=88 --statistics
+      - name: Set up test database
+        env:
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/cruddur_test
+        run: |
+          cd backend-flask
+          python -c "
+          import psycopg2
+          from db.schema_load import load_schema
+          load_schema()
+          "
 
-        - name: Run unit tests
-          env:
-            DATABASE_URL: postgresql://postgres:password@localhost:5432/cruddur_test
-            FLASK_ENV: testing
-          run: |
-            cd backend-flask
-            python -m pytest tests/ -v --tb=short --cov=. --cov-report=xml --cov-report=html
-        - name: Upload coverage reports
-          uses: codecov/codecov-action@v3
-          with:
-            file: backend-flask/coverage.xml
-            flags: backend
+      - name: Run unit tests
+        env:
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/cruddur_test
+          FLASK_ENV: testing
+        run: |
+          cd backend-flask
+          python -m pytest tests/ -v --tb=short --cov=. --cov-report=xml --cov-report=html
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: backend-flask/coverage.xml
+          flags: backend
 
-        - name: Upload test artifacts 
-          uses: actions/upload-artifact@v3
-          if: always()
-          with:
-            name: backend-test-results
-            path: | 
-              backend-flask/coverage.xml
-              backend-flask/htmlcov/
+      - name: Upload test artifacts 
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: backend-test-results
+          path: | 
+            backend-flask/coverage.xml
+            backend-flask/htmlcov/
 
 #======================= Frontend Testing =================================
 
